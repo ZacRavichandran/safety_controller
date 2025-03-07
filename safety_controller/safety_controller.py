@@ -8,7 +8,7 @@ class JoyTwistMux(Node):
         super().__init__('joy_twist_mux')
         
         self.joy_sub = self.create_subscription(Joy, '/joy_teleop/joy', self.joy_callback, 10)
-        self.jackal_sub = self.create_subscription(Twist, '/jackal_velocity_controller/cmd_vel_unstamped', self.jackal_callback, 10)
+        self.jackal_sub = self.create_subscription(Twist, '/jackal_velocity_controller/cmd_vel_rc', self.jackal_callback, 10)
         self.mpc_sub = self.create_subscription(Twist, '/planners/mpc_cmd_vel_unstamped', self.mpc_callback, 10)
         
         self.cmd_pub = self.create_publisher(TwistStamped, '/jackal_velocity_controller/cmd_vel', 10)
@@ -20,7 +20,7 @@ class JoyTwistMux(Node):
         self.zero = Twist()
     
     def joy_callback(self, msg: Joy):
-        self.axis_5_value = msg.axes[5]
+        self.axis_5_value = msg.axes[4]
         self.publish_selected_cmd()
     
     def jackal_callback(self, msg: Twist):
