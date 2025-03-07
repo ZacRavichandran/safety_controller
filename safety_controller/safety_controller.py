@@ -14,7 +14,7 @@ class JoyTwistMux(Node):
         self.cmd_pub = self.create_publisher(TwistStamped, '/jackal_velocity_controller/cmd_vel', 10)
         
         self.axis_5_value = None
-        self.jackal_cmd = None
+        self.controller_cmd = None
         self.mpc_cmd = None
 
         self.zero = Twist()
@@ -24,7 +24,7 @@ class JoyTwistMux(Node):
         self.publish_selected_cmd()
     
     def jackal_callback(self, msg: Twist):
-        self.jackal_cmd = msg
+        self.controller_cmd = msg
         self.publish_selected_cmd()
     
     def mpc_callback(self, msg: Twist):
@@ -36,8 +36,8 @@ class JoyTwistMux(Node):
         
         if self.axis_5_value == 1 and self.mpc_cmd is not None:
             twist_msg = self.mpc_cmd
-        elif self.axis_5_value == -1 and self.jackal_cmd is not None:
-            twist_msg = self.jackal_cmd
+        elif self.axis_5_value == -1 and self.controller_cmd is not None:
+            twist_msg = self.controller_cmd
         else:
             twist_msg = self.zero
         
