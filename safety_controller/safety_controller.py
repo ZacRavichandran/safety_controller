@@ -8,7 +8,7 @@ class JoyTwistMux(Node):
         super().__init__('joy_twist_mux')
         
         self.joy_sub = self.create_subscription(Joy, '/joy_teleop/joy', self.joy_callback, 10)
-        self.jackal_sub = self.create_subscription(Twist, '/jackal_velocity_controller/cmd_vel_rc', self.jackal_callback, 10)
+        self.jackal_sub = self.create_subscription(Twist, '/jackal_velocity_controller/cmd_vel_unstamped', self.jackal_callback, 10)
         self.mpc_sub = self.create_subscription(Twist, '/planners/mpc_cmd_vel_unstamped', self.mpc_callback, 10)
         
         self.cmd_pub = self.create_publisher(TwistStamped, '/jackal_velocity_controller/cmd_vel', 10)
