@@ -34,12 +34,18 @@ class JoyTwistMux(Node):
     def publish_selected_cmd(self):
         twist_msg = None
         
+        source = ""
         if self.axis_5_value == 1 and self.mpc_cmd is not None:
             twist_msg = self.mpc_cmd
+            source = "MPC"
         elif self.axis_5_value == -1 and self.controller_cmd is not None:
             twist_msg = self.controller_cmd
+            source = "Controller"
         else:
             twist_msg = self.zero
+            source = "stop"
+
+        self.get_logger().info(f"Publishing velocity from {source}")
         
         stamped_msg = TwistStamped()
         stamped_msg.header.stamp = self.get_clock().now().to_msg()
