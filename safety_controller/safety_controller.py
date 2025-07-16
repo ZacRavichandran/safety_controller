@@ -23,7 +23,7 @@ class JoyTwistMux(Node):
         axis_value = msg.axes[4]
 
         if axis_value == 1.0:
-            self.auto_cmd.publish(self.auto_cmd)
+            self.auto_mode_pub.publish(self.auto_cmd)
 
 def main(args=None):
     rclpy.init(args=args)
