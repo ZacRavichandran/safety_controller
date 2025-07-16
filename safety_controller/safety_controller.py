@@ -7,51 +7,23 @@ class JoyTwistMux(Node):
     def __init__(self):
         super().__init__('joy_twist_mux')
         
-        self.joy_sub = self.create_subscription(Joy, '/joy_teleop/joy', self.joy_callback, 10)
-        self.jackal_sub = self.create_subscription(Twist, '/jackal_velocity_controller/cmd_vel_unstamped', self.jackal_callback, 10)
-        self.mpc_sub = self.create_subscription(Twist, '/planners/mpc_cmd_vel_unstamped', self.mpc_callback, 10)
+        self.auto_cmd_sub = self.create_subscription(
+            Twist, '/j100_0000/autonomous/cmd_vel', self.auto_cmd_callback, 10)
+        self.joy_sub = self.create_subscription(
+            Joy, '/j100_0000/joy_teleop/joy', self.joy_callback, 10)
         
-        self.cmd_pub = self.create_publisher(TwistStamped, '/jackal_velocity_controller/cmd_vel', 10)
-        
-        self.axis_5_value = None
-        self.controller_cmd = None
-        self.mpc_cmd = None
+        self.auto_mode_pub = self.create_publisher(TwistStamped, '/j100_0000/auto_mode/cmd_vel', 10)
 
-        self.zero = Twist()
-    
+        self.auto_cmd = None
+
+    def auto_cmd_callback(self, msg: Twist):
+        self.auto_cmd = msg
+
     def joy_callback(self, msg: Joy):
-        self.axis_5_value = msg.axes[4]
-        self.publish_selected_cmd()
-    
-    def jackal_callback(self, msg: Twist):
-        self.controller_cmd = msg
-        self.publish_selected_cmd()
-    
-    def mpc_callback(self, msg: Twist):
-        self.mpc_cmd = msg
-        self.publish_selected_cmd()
-    
-    def publish_selected_cmd(self):
-        twist_msg = None
-        
-        source = ""
-        if self.axis_5_value == 1 and self.mpc_cmd is not None:
-            twist_msg = self.mpc_cmd
-            source = "MPC"
-        elif self.axis_5_value == -1 and self.controller_cmd is not None:
-            twist_msg = self.controller_cmd
-            source = "Controller"
-        else:
-            twist_msg = self.zero
-            source = "stop"
+        axis_value = msg.axes[4]
 
-        self.get_logger().info(f"Publishing velocity from {source}")
-        
-        stamped_msg = TwistStamped()
-        stamped_msg.header.stamp = self.get_clock().now().to_msg()
-        stamped_msg.header.frame_id = 'base_link'
-        stamped_msg.twist = twist_msg
-        self.cmd_pub.publish(stamped_msg)
+        if axis_value == 1.0:
+            self.cmd_pub.publish(self.auto_cmd)
 
 def main(args=None):
     rclpy.init(args=args)
