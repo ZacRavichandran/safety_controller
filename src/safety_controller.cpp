@@ -41,3 +41,12 @@ private:
 
     geometry_msgs::msg::TwistStamped::SharedPtr auto_cmd_vel_;
 };
+
+int main(int argc, char **argv)
+{
+    rclcpp::init(argc, argv);
+    shared_ptr<SafetyController> node = make_shared<SafetyController>();
+    rclcpp::spin(node);
+    rclcpp::shutdown();
+    return 0;
+}
