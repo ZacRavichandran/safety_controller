@@ -8,12 +8,12 @@ class SafetyController: public rclcpp::Node{
 public:
     SafetyController(): Node("safety_controller"){
         auto_cmd_vel_subscriber_ = this->create_subscription<geometry_msgs::msg::TwistStamped>(
-            "/j100_0000/autonomous/cmd_vel", 1, bind(&SafetyController::auto_cmd_vel_callback, this, placeholders::_1));
+            "autonomous/cmd_vel", 1, bind(&SafetyController::auto_cmd_vel_callback, this, placeholders::_1));
         joy_subscriber_ = this->create_subscription<sensor_msgs::msg::Joy>(
-            "/j100_0000/joy_teleop/joy", 1, bind(&SafetyController::joy_callback, this, placeholders::_1));
+            "joy_teleop/joy", 1, bind(&SafetyController::joy_callback, this, placeholders::_1));
 
         auto_mode_cmd_vel_publisher_ = this->create_publisher<geometry_msgs::msg::TwistStamped>(
-            "/j100_0000/auto_mode/cmd_vel", 10);
+            "auto_mode/cmd_vel", 10);
     }
 
 private:
