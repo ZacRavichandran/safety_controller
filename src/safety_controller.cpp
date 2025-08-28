@@ -26,7 +26,7 @@ private:
 
         if (axis_value == 1.0){
             if (!auto_cmd_vel_) {
-                RCLCPP_WARN(this->get_logger(), "Haven't received Autonomous Command Yet");
+                // RCLCPP_WARN(this->get_logger(), "Haven't received Autonomous Command Yet");
                 return;
             }
             
