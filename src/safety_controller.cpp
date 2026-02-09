@@ -19,19 +19,32 @@ public:
 private:
     void auto_cmd_vel_callback(geometry_msgs::msg::TwistStamped::SharedPtr msg){
         auto_cmd_vel_ = msg;
+        if (axis_value_ == 1.0){
+            auto_mode_cmd_vel_publisher_->publish(*auto_cmd_vel_);
+        }
+        else{
+            RCLCPP_WARN_THROTTLE(this->get_logger(), *this->get_clock(), 5000,
+                                 "Not in Auto Mode. Check Joystick Subscriber.");
+            return;
+        }
+
+        RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 2000,
+                             "Received Autonomous Cmd Vel: Linear X: %.2f, Angular Z: %.2f",
+                             auto_cmd_vel_->twist.linear.x, auto_cmd_vel_->twist.angular.z);
     }
 
     void joy_callback(sensor_msgs::msg::Joy::SharedPtr msg){
-        float axis_value = msg->axes[4];
+        // float axis_value = msg->axes[4];
+        axis_value_ = msg->axes[4];
 
-        if (axis_value == 1.0){
-            if (!auto_cmd_vel_) {
-                // RCLCPP_WARN(this->get_logger(), "Haven't received Autonomous Command Yet");
-                return;
-            }
+        // if (axis_value == 1.0){
+        //     if (!auto_cmd_vel_) {
+        //         // RCLCPP_WARN(this->get_logger(), "Haven't received Autonomous Command Yet");
+        //         return;
+        //     }
             
-            auto_mode_cmd_vel_publisher_->publish(*auto_cmd_vel_);
-        }
+        //     auto_mode_cmd_vel_publisher_->publish(*auto_cmd_vel_);
+        // }
     }
 
     rclcpp::Subscription<geometry_msgs::msg::TwistStamped>::SharedPtr auto_cmd_vel_subscriber_;
@@ -40,6 +53,8 @@ private:
     rclcpp::Publisher<geometry_msgs::msg::TwistStamped>::SharedPtr auto_mode_cmd_vel_publisher_;
 
     geometry_msgs::msg::TwistStamped::SharedPtr auto_cmd_vel_;
+
+    float axis_value_= 0.0f;
 };
 
 int main(int argc, char **argv)
